@@ -28,7 +28,6 @@ import com.aitest.web.entity.UserEntity;
 import com.aitest.web.service.LoginService;
 
 @Controller
-@SessionAttributes("username") 
 public class LoginController {
 	@Autowired  
     LoginService loginService;
