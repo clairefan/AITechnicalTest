@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aitest.web.mapper.ProductMapper"> 
+	<sql id="searchProductCondition">
+		<where>
+            	<if test="productId!=null and productId.toString!=''"> 
+            		productid like #{productId,jdbcType=VARCHAR}
+            	</if>
+            	<if test="productName!=null and productName.toString!=''"> 
+            		and productname like #{productName,jdbcType=VARCHAR}
+            	</if> 
+            	<if test="highPrice!=null"> 
+            		and price &lt; #{highPrice,jdbcType=DOUBLE}
+            	</if> 
+            	<if test="lowPrice!=null"> 
+            		and price &gt; #{lowPrice,jdbcType=DOUBLE}
+            	</if> 
+          </where>
+	</sql>
+	<select id="getAllProducts" parameterType="com.aitest.web.dto.SearchProductDto" resultType="com.aitest.web.entity.ProductEntity">   
+            select * ,getCategoryPath(y.categoryid) as categoryPath 
+            from demoweb_product y
+            <include refid="searchProductCondition"/>
+            <if test="sortByColumn!=null and sortByColumn.toString!=''">
+            	order by ${sortByColumn,jdbcType=VARCHAR} 
+            	<if test="sortType=='1'.toString">
+            		ASC
+            	</if>
+            	<if test="sortType=='2'.toString">
+            		DESC
+            	</if>
+            </if>
+            limit  #{from,jdbcType=INTEGER}, #{to,jdbcType=INTEGER}
+    </select>
+    
+    <select id="countProducts" parameterType="com.aitest.web.dto.SearchProductDto" resultType="int">   
+            select count(*) 
+            from demoweb_product y
+            <include refid="searchProductCondition"/>
+            limit  #{from,jdbcType=VARCHAR}, #{to,jdbcType=VARCHAR}
+    </select>
+    
+    <select id="getProductById" parameterType="String" resultType="com.aitest.web.entity.ProductEntity">   
+    	select * ,getCategoryPath(y.categoryid) as categoryPath 
+        from demoweb_product y
+        where  productid = #{productId,jdbcType=VARCHAR}  
+    </select>
+    
+    <update id="modifyProduct" parameterType="com.aitest.web.entity.ProductEntity"> 
+        update demoweb_product
+          <set>
+            <if test="productName!= null and productName.toString!=''">
+            	productname=#{productName,jdbcType=VARCHAR},
+            </if>
+            <if test="price!= null and price.toString!=''">
+            	price=#{price,jdbcType=DOUBLE},
+            </if>
+            <if test="categoryId!= null and categoryId.toString!=''">
+            	categoryId=#{categoryId,jdbcType=VARCHAR},
+            </if>
+            <if test="description!= null and description.toString!=''">
+            	description=#{description,jdbcType=VARCHAR},
+            </if>
+            <if test="available!= null and available.toString!=''">
+            	available=#{available,jdbcType=INTEGER}
+            </if>
+          </set>
+        where productid=#{productId,jdbcType=VARCHAR}
+    </update>
+     
+    <delete id="deleteProductById" parameterType="String">
+    	delete from demoweb_product where productid=#{productId,jdbcType=VARCHAR}
+    </delete>
+    
+    <insert id="addProduct" parameterType="com.aitest.web.entity.ProductEntity">
+    	insert into demoweb_product 
+    	(productid, productname, price, categoryid, description, available) 
+    	VALUES ({productId,jdbcType=VARCHAR}, #{productName,jdbcType=VARCHAR}, #{price,jdbcType=DOUBLE}',
+    		 #{categoryId,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR},#{available,jdbcType=INTEGER})
+    </insert>
+</mapper>

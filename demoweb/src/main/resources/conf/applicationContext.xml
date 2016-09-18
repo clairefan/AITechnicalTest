@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+ xmlns:context="http://www.springframework.org/schema/context"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+      http://www.springframework.org/schema/context
+      http://www.springframework.org/schema/context/spring-context.xsd">
+ <context:component-scan base-package="com.aitest.web.controller" />
+ <context:component-scan base-package="com.aitest.web.service" />
+<context:property-placeholder location="classpath:conf/jdbc.properties"/>
+<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">  
+    <property name="driverClassName" value="${jdbc_driverClassName}" />  
+    <property name="url" value="${jdbc_url}" />
+    <property name="username"><value>${jdbc_username}</value></property> 
+    <property name="password"><value>${jdbc_password}</value></property>   
+</bean> 
+<!-- myBatis文件 -->  
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">  
+        <property name="dataSource" ref="dataSource" />  
+        <property name="mapperLocations" value="classpath:com/aitest/web/mapper/*Mapper.xml" />  
+    </bean>  
+  
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">  
+    	<property name="annotationClass" value="org.springframework.stereotype.Repository"/>
+        <property name="basePackage" value="com.aitest.web.mapper" />  
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />  
+    </bean>  
+  <bean id="userMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">  
+    <property name="mapperInterface" value="com.aitest.web.mapper.UserMapper" />  
+    <property name="sqlSessionFactory" ref="sqlSessionFactory" />  
+	</bean> 
+    <!-- 配置事务管理器 -->  
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">  
+        <property name="dataSource" ref="dataSource" />  
+    </bean>  
+    
+    
+    
+</beans>
